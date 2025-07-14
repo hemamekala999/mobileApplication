@@ -1,0 +1,383 @@
+import * as React from 'react';
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+// -------- Login Screen --------
+function LoginScreen({ navigation }) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const handleLogin = () => {
+    if (email === 'user@example.com' && password === 'password') {
+      navigation.replace('Home');
+    } else {
+      Alert.alert('Login Failed', 'Use email: user@example.com and password: password');
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+      <View style={styles.loginBox}>
+        <Text style={styles.title}>Welcome Back 👋</Text>
+        <Text style={styles.subtitle}>Login to continue</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          secureTextEntry
+          onChangeText={setPassword}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Log In</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
+
+// -------- Dev Buttons --------
+const ButtonGrid = () => {
+  const buttons = [
+    'Cybersecurity',
+    'PowerPlatform Full Stack Developer',
+    'Java Developer',
+    '.NET Developer',
+    'PHP Developer',
+    'Pega Developer',
+  ];
+  return (
+    <ScrollView contentContainerStyle={styles.grid}>
+      {buttons.map((btn, idx) => (
+        <TouchableOpacity
+          key={idx}
+          style={styles.devButton}
+          onPress={() => alert(btn)}
+        >
+          <Text style={styles.devButtonText}>{btn}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+};
+
+// -------- All Exams Tab with Popular Exams Above Categories --------
+function AllExamsScreen() {
+  const categories = [
+    'TSPSC Group 2',
+    'APPSC',
+    'SSC CGL',
+    'SSC CHSL',
+    'SSC MTS',
+    'UPSC Civil Services',
+    'Bank PO',
+    'Bank Clerk',
+    'RRB NTPC',
+    'RRB Group D',
+    'State Police',
+    'UP Police Sub Inspector',
+    'Insurance Exams',
+    'LIC AAO',
+    'NDA',
+    'CDS',
+    'IBPS RRB',
+    'EPFO',
+    'DRDO CEPTAM',
+  ];
+
+  const popularExams = [
+    'TSPSC Group2',
+    'SSC CGL',
+    'SSC CHSL',
+    'SSC MTS',
+    'UP Police Sub Inspector',
+  ];
+
+  const [search, setSearch] = React.useState('');
+
+  const filteredCategories = categories.filter((item) =>
+    item.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <View style={styles.subTabContent}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search categories..."
+        value={search}
+        onChangeText={setSearch}
+      />
+
+      {/* Popular Exams Section */}
+      <View style={styles.popularSectionContainer}>
+        <Text style={styles.popularTitle}>Popular Exams</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.popularScroll}
+        >
+          {popularExams.map((exam, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.popularButton}
+              onPress={() => alert(`Selected ${exam}`)}
+            >
+              <Text style={styles.popularButtonText}>{exam}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Categories Section */}
+      <ScrollView contentContainerStyle={styles.grid}>
+        {filteredCategories.map((cat, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.devButton}
+            onPress={() => alert(`Selected ${cat}`)}
+          >
+            <Text style={styles.devButtonText}>{cat}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+// -------- Start Exams Tab Placeholder --------
+function StartExamsScreen() {
+  return (
+    <View style={styles.subTabScreen}>
+      <Text style={styles.subTabText}>Start Exams Content</Text>
+    </View>
+  );
+}
+
+// -------- Gov Exams Tabs (Nested) --------
+function GovExamsScreen() {
+  const InnerTab = createMaterialTopTabNavigator();
+  return (
+    <InnerTab.Navigator>
+      <InnerTab.Screen name="All Exams" component={AllExamsScreen} />
+      <InnerTab.Screen name="Start Exams" component={StartExamsScreen} />
+    </InnerTab.Navigator>
+  );
+}
+
+function PrivateJobsScreen() {
+  return (
+    <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
+      <Text style={styles.subTabText}>Private Jobs Preparation Content</Text>
+      <Text style={styles.subTitle}>Explore Career Paths</Text>
+      <ButtonGrid />
+    </ScrollView>
+  );
+}
+
+// -------- Home Tabs --------
+const Tab = createMaterialTopTabNavigator();
+
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1 }}>
+      <Text style={styles.screenTitle}>Hi, Welcome!</Text>
+      <Tab.Navigator>
+        <Tab.Screen name="Gov. Exams" component={GovExamsScreen} />
+        <Tab.Screen name="Private Jobs" component={PrivateJobsScreen} />
+      </Tab.Navigator>
+    </View>
+  );
+}
+
+// -------- Navigation --------
+const Stack = createStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerTitle: 'Dashboard' }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// -------- Styles --------
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#edf2f6',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  loginBox: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    backgroundColor: '#fafafa',
+    fontSize: 16,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#4e88ff',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  screenTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginVertical: 12,
+    textAlign: 'center',
+    color: '#333',
+  },
+  subTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginVertical: 12,
+    marginLeft: 12,
+    color: '#444',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    paddingBottom: 20,
+  },
+  devButton: {
+    backgroundColor: '#f0f4ff',
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    margin: 8,
+    minWidth: '42%',
+    alignItems: 'center',
+    borderColor: '#4e88ff',
+    borderWidth: 1,
+  },
+  devButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    textAlign: 'center',
+  },
+  subTabScreen: {
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eef3fa',
+  },
+  subTabText: {
+    fontSize: 16,
+    color: '#444',
+    fontWeight: '500',
+  },
+  subTabContent: {
+    flexGrow: 1,
+    backgroundColor: '#fff',
+  },
+  searchInput: {
+    height: 45,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    margin: 12,
+    backgroundColor: '#fafafa',
+  },
+  popularSectionContainer: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#3f7df8',
+    borderRadius: 14,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    shadowColor: '#3f7df8',
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  popularTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  popularScroll: {
+    paddingLeft: 4,
+  },
+  popularButton: {
+    backgroundColor: '#1a4ed8',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 30,
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  popularButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+});
