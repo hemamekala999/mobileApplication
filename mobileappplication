@@ -1,0 +1,446 @@
+import * as React from 'react';
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  FlatList,
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+// -------- Login Screen --------
+function LoginScreen({ navigation }) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const handleLogin = () => {
+    if (email === 'user@example.com' && password === 'password') {
+      navigation.replace('Home');
+    } else {
+      Alert.alert('Login Failed', 'Use email: user@example.com and password: password');
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <View style={styles.loginBox}>
+        <Text style={styles.title}>Welcome Back 👋</Text>
+        <Text style={styles.subtitle}>Login to continue</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          onChangeText={setEmail}
+          placeholderTextColor="#555"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          secureTextEntry
+          onChangeText={setPassword}
+          placeholderTextColor="#555"
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.8}>
+          <Text style={styles.buttonText}>Log In</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
+
+// -------- Dev Buttons --------
+const ButtonGrid = () => {
+  const buttons = [
+    'Cybersecurity',
+    'PowerPlatform Full Stack Developer',
+    'Java Developer',
+    '.NET Developer',
+    'PHP Developer',
+    'Pega Developer',
+  ];
+  return (
+    <ScrollView contentContainerStyle={styles.grid}>
+      {buttons.map((btn, idx) => (
+        <TouchableOpacity
+          key={idx}
+          style={styles.devButton}
+          onPress={() => alert(btn)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.devButtonText}>{btn}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+};
+
+// -------- All Exams Tab with Popular & Categories --------
+function AllExamsScreen() {
+  const categories = [
+    'TSPSC Group 2',
+    'APPSC',
+    'SSC CGL',
+    'SSC CHSL',
+    'SSC MTS',
+    'UPSC Civil Services',
+    'Bank PO',
+    'Bank Clerk',
+    'RRB NTPC',
+    'RRB Group D',
+    'State Police',
+    'UP Police Sub Inspector',
+    'Insurance Exams',
+    'LIC AAO',
+    'NDA',
+    'CDS',
+    'IBPS RRB',
+    'EPFO',
+    'DRDO CEPTAM',
+  ];
+
+  const popularExams = [
+    'TSPSC Group2',
+    'SSC CGL',
+    'SSC CHSL',
+    'SSC MTS',
+    'UP Police Sub Inspector',
+  ];
+
+  const [search, setSearch] = React.useState('');
+
+  const filteredCategories = categories.filter((item) =>
+    item.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <ScrollView style={styles.subTabContent} keyboardShouldPersistTaps="handled">
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search categories..."
+        value={search}
+        onChangeText={setSearch}
+        placeholderTextColor="#555"
+      />
+
+      <Text style={styles.subTitle}>Popular Exams</Text>
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={popularExams}
+        keyExtractor={(item, idx) => idx.toString()}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.devButtonHorizontal}
+            onPress={() => alert(`Selected ${item}`)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.devButtonText}>{item}</Text>
+          </TouchableOpacity>
+        )}
+      />
+
+      <Text style={styles.subTitle}>All Categories</Text>
+
+      <FlatList
+        data={filteredCategories}
+        keyExtractor={(item, idx) => idx.toString()}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.categoryGridItem}
+            onPress={() => alert(`Selected ${item}`)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.devButtonText}>{item}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </ScrollView>
+  );
+}
+
+// -------- Start Exams Tab Placeholder --------
+function StartExamsScreen() {
+  return (
+    <View style={styles.subTabScreen}>
+      <Text style={styles.subTabText}>Start Exams Content</Text>
+    </View>
+  );
+}
+
+// -------- Gov Exams Tabs (Nested) --------
+function GovExamsScreen() {
+  const InnerTab = createMaterialTopTabNavigator();
+  return (
+    <InnerTab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: '#4e88ff',
+        tabBarIndicatorStyle: { backgroundColor: '#4e88ff' },
+        tabBarLabelStyle: { fontWeight: '600' },
+      }}
+    >
+      <InnerTab.Screen name="All Exams" component={AllExamsScreen} />
+      <InnerTab.Screen name="Start Exams" component={StartExamsScreen} />
+    </InnerTab.Navigator>
+  );
+}
+
+function PrivateJobsScreen() {
+  return (
+    <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
+      <Text style={styles.subTabText}>Private Jobs Preparation Content</Text>
+      <Text style={styles.subTitle}>Explore Career Paths</Text>
+      <ButtonGrid />
+    </ScrollView>
+  );
+}
+
+// -------- Home Tabs --------
+const Tab = createMaterialTopTabNavigator();
+
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1 }}>
+      <Text style={styles.screenTitle}>Hi, Welcome!</Text>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarActiveTintColor: '#4e88ff',
+          tabBarIndicatorStyle: { backgroundColor: '#4e88ff' },
+          tabBarLabelStyle: { fontWeight: '700', fontSize: 14 },
+          tabBarStyle: { backgroundColor: '#f0f4ff' },
+        }}
+      >
+        <Tab.Screen name="Gov. Exams" component={GovExamsScreen} />
+        <Tab.Screen name="Private Jobs" component={PrivateJobsScreen} />
+      </Tab.Navigator>
+    </View>
+  );
+}
+
+// -------- Navigation --------
+const Stack = createStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: '#4e88ff' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: '700' },
+        }}
+      >
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerTitle: 'Dashboard' }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// -------- Styles --------
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#edf2f6',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  loginBox: {
+    backgroundColor: '#e4ecff',
+    borderRadius: 24,
+    padding: 28,
+    shadowColor: '#4e88ff',
+    shadowOpacity: 0.6,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#2446a8',
+    marginBottom: 8,
+    textAlign: 'center',
+    textShadowColor: '#87a4ff',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#3a4e8c',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  input: {
+    height: 52,
+    borderColor: '#7a9fff',
+    borderWidth: 2,
+    borderRadius: 16,
+    marginBottom: 18,
+    paddingHorizontal: 18,
+    backgroundColor: '#d7e3ff',
+    fontSize: 18,
+    color: '#2446a8',
+    fontWeight: '600',
+    shadowColor: '#4e88ff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  button: {
+    backgroundColor: '#3b6df7',
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#3b6df7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+  },
+  buttonText: {
+    color: '#e0e6ff',
+    fontSize: 20,
+    fontWeight: '700',
+    textShadowColor: '#2446a8',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginVertical: 14,
+    textAlign: 'center',
+    color: '#2446a8',
+    textShadowColor: '#a7b8ff',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 5,
+  },
+  subTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginVertical: 14,
+    marginLeft: 18,
+    color: '#2d4db9',
+    textShadowColor: '#b3c1ff',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 5,
+  },
+
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    paddingBottom: 20,
+  },
+  devButton: {
+    backgroundColor: '#a3b9ff',
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    margin: 10,
+    minWidth: '42%',
+    alignItems: 'center',
+    borderColor: '#3b6df7',
+    borderWidth: 1.8,
+    shadowColor: '#3b6df7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+  },
+  devButtonHorizontal: {
+    backgroundColor: '#a3b9ff',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginRight: 14,
+    minWidth: 140,
+    alignItems: 'center',
+    borderColor: '#3b6df7',
+    borderWidth: 1.8,
+    shadowColor: '#3b6df7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+  },
+  devButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#2446a8',
+    textAlign: 'center',
+    textShadowColor: '#e1e7ff',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+
+  subTabScreen: {
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e4ecff',
+  },
+  subTabText: {
+    fontSize: 18,
+    color: '#2d4db9',
+    fontWeight: '600',
+  },
+  subTabContent: {
+    flexGrow: 1,
+    backgroundColor: '#f0f4ff',
+  },
+  searchInput: {
+    height: 48,
+    borderColor: '#7a9fff',
+    borderWidth: 2,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    margin: 14,
+    backgroundColor: '#d7e3ff',
+    fontSize: 16,
+    color: '#2446a8',
+    fontWeight: '600',
+    shadowColor: '#4e88ff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+  },
+
+  row: {
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  categoryGridItem: {
+    backgroundColor: '#acc8ff',
+    paddingVertical: 22,
+    borderRadius: 24,
+    flex: 1,
+    marginHorizontal: 10,
+    alignItems: 'center',
+    shadowColor: '#3b6df7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.7,
+    shadowRadius: 14,
+    borderWidth: 1.6,
+    borderColor: '#3b6df7',
+    minWidth: 140,
+  },
+});
