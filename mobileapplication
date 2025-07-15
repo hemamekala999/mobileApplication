@@ -1,3 +1,5 @@
+// App.js
+
 import * as React from 'react';
 import {
   Text,
@@ -16,11 +18,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import CheckBox from '@react-native-community/checkbox';
+import Checkbox from 'expo-checkbox';
+
 // ----- Login Screen -----
 function LoginScreen({ navigation }) {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+
   const handleLogin = () => {
     if (email === 'user@example.com' && password === 'password') {
       navigation.replace('Home');
@@ -28,6 +32,7 @@ function LoginScreen({ navigation }) {
       Alert.alert('Login Failed', 'Use email: user@example.com and password: password');
     }
   };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -61,44 +66,43 @@ function LoginScreen({ navigation }) {
   );
 }
 
-// ----- SSC-Specific Screen with Header & Search -----
+// ----- SSC Exams Screen -----
 const popularSscExams = ['SSC CGL', 'SSC CHSL', 'SSC MTS', 'IB ACIO', 'SSC GD Constable'];
 
 function SscPopularScreen({ navigation }) {
-  
   const sscExams = [
-
-  'SSC Selection Post',
-  'SSC CPO',
-  'SSC Stenographer',
-  'Delhi Police Head Constable',
-  'SSC Head Constable AWO TPO',
-  'Delhi Police MTS',
-  'IB Security Assistant',
-  'Delhi Police Driver',
-  'SSC JHT',
-  'CCRAS LDC UDC',
-  'Current Affairs SSC JE CE',
-  'SSC JE ME',
-  'CSIR ASO',
-  'SSC Scientific Assistant',
-  'Delhi Forest Guard',
-  'RSMSSB JE Supreme Court Junior Court',
-  'ICMR Assistant',
-  'NBBE',
-  'NTAA',
-  'Delhi University Non Teaching'
-];
-  
+    'SSC Selection Post',
+    'SSC CPO',
+    'SSC Stenographer',
+    'Delhi Police Head Constable',
+    'SSC Head Constable AWO TPO',
+    'Delhi Police MTS',
+    'IB Security Assistant',
+    'Delhi Police Driver',
+    'SSC JHT',
+    'CCRAS LDC UDC',
+    'Current Affairs SSC JE CE',
+    'SSC JE ME',
+    'CSIR ASO',
+    'SSC Scientific Assistant',
+    'Delhi Forest Guard',
+    'RSMSSB JE Supreme Court Junior Court',
+    'ICMR Assistant',
+    'NBBE',
+    'NTAA',
+    'Delhi University Non Teaching',
+  ];
 
   const [search, setSearch] = React.useState('');
+  const [checkedItems, setCheckedItems] = React.useState({});
+
   const filtered = sscExams.filter((e) =>
     e.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <ScrollView style={styles.subTabContent} keyboardShouldPersistTaps="handled">
-      {/* Header Row */}
+      {/* Header */}
       <View style={styles.headerRow}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <MaterialIcons name="school" size={28} color="#4e88ff" style={{ marginRight: 8 }} />
@@ -109,7 +113,7 @@ function SscPopularScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Search Input */}
+      {/* Search */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search SSC exams..."
@@ -118,52 +122,69 @@ function SscPopularScreen({ navigation }) {
         placeholderTextColor="#555"
       />
 
-      {/* Popular SSC Exams */}
+      {/* Popular */}
       <Text style={[styles.subTitle, { marginTop: 0 }]}>Popular SSC Exams</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingLeft: 12 }}>
-        {popularSscExams.map((exam, idx) => (
+        {popularSscExams.map((exam) => (
           <TouchableOpacity
-            key={idx}
+            key={exam}
             style={{ marginRight: 12 }}
             onPress={() => Alert.alert('Selected', exam)}
             activeOpacity={0.8}
           >
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              style={styles.popularExamCard}
-            >
+            <LinearGradient colors={['#667eea', '#764ba2']} style={styles.popularExamCard}>
               <Text style={styles.popularExamText}>{exam}</Text>
             </LinearGradient>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* All SSC Exams */}
+      {/* All with Checkboxes */}
       <Text style={styles.subTitle}>All SSC Exams</Text>
-       <FlatList
+      <FlatList
         data={filtered}
-        keyExtractor={(i, idx) => idx.toString()}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
+        keyExtractor={(item) => item}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
         renderItem={({ item }) => {
-          const isSsc = item === 'SSC Exams';
+          const isChecked = checkedItems[item] || false;
           return (
-            <TouchableOpacity
-              style={[styles.categoryGridItem, isSsc && styles.sscCategoryHighlight]}
-              onPress={() => onCategoryPress(item)}
-              activeOpacity={0.8}
-            >
-              <FontAwesome5 name="clipboard-list" size={18} color={isSsc ? '#fff' : '#2446a8'} />
-              <Text style={[styles.devButtonText, isSsc && { color: '#fff', fontWeight: '800' }]}>{item}</Text>
-            </TouchableOpacity>
+            <View style={styles.checkboxRow}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <FontAwesome5 name="clipboard-list" size={18} color="#2446a8" />
+                <Text style={[styles.devButtonText, { marginLeft: 10 }]}>{item}</Text>
+                
+
+              </View>
+              <Checkbox
+                value={isChecked}
+                onValueChange={(newVal) =>
+                  setCheckedItems((prev) => ({ ...prev, [item]: newVal }))
+                }
+                color={isChecked ? '#4e88ff' : undefined}
+              />
+            </View>
           );
         }}
       />
+      {Object.values(checkedItems).some(val => val) && (
+  <TouchableOpacity
+    onPress={() => {
+      const selected = Object.entries(checkedItems)
+        .filter(([_, val]) => val)
+        .map(([key]) => key)
+        .join(', ');
+      Alert.alert('Start Preparation', `You selected: ${selected}`);
+    }}
+    style={styles.startPrepButton}
+  >
+    <Text style={styles.startPrepButtonText}>Start Preparation</Text>
+  </TouchableOpacity>
+)}
     </ScrollView>
   );
 }
-// ----- All Exams Main Screen -----
+
+// ----- Other Screens -----
 function AllExamsScreen({ navigation }) {
   const categories = [
     'SSC Exams',
@@ -186,7 +207,6 @@ function AllExamsScreen({ navigation }) {
     'Judiciary Exams',
     'Regulatory Body Exams',
   ];
-
   const popularExams = [
     'SSC CGL',
     'Bank PO',
@@ -194,29 +214,16 @@ function AllExamsScreen({ navigation }) {
     'Railways Exams',
     'Defence Exams',
   ];
-
   const [search, setSearch] = React.useState('');
   const [selectedPopular, setSelectedPopular] = React.useState(null);
-  const prepButtons = ['Start Preparation', 'Syllabus', 'Previous Papers', 'Mock Tests'];
+
+  const prepButtons = ['Start Prep', 'Syllabus', 'Previous Papers', 'Mock Tests'];
   const filtered = categories.filter((c) =>
     c.toLowerCase().includes(search.toLowerCase())
   );
 
-  const onPopularPress = (exam) => {
-    setSelectedPopular((prev) => (prev === exam ? null : exam));
-  };
-
-  const onCategoryPress = (cat) => {
-    if (cat === 'SSC Exams') {
-      navigation.navigate('SscPopular');
-    } else {
-      navigation.navigate('CategoryDetails', { category: cat });
-    }
-  };
-
   return (
     <ScrollView style={styles.subTabContent} keyboardShouldPersistTaps="handled">
-      {/* Search */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search categories..."
@@ -225,43 +232,34 @@ function AllExamsScreen({ navigation }) {
         placeholderTextColor="#555"
       />
 
-      {/* Popular Exams Slider */}
       <Text style={styles.subTitle}>Popular Exams</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 8 }}>
-        {popularExams.map((exam, i) => (
-          <View key={i} style={{ marginRight: 12 }}>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => onPopularPress(exam)}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingLeft: 12 }}>
+        {popularExams.map((exam) => (
+          <View key={exam} style={{ marginRight: 12 }}>
+            <TouchableOpacity onPress={() => setSelectedPopular((p) => (p === exam ? null : exam))}>
               <LinearGradient
-                colors={selectedPopular === exam ? ['#ff5e62', '#ff9966'] : ['#a3b9ff', '#7a99ff']}
+                colors={
+                  selectedPopular === exam
+                    ? ['#ff5e62', '#ff9966']
+                    : ['#a3b9ff', '#7a99ff']
+                }
                 style={styles.devButtonHorizontal}
               >
-                <MaterialIcons
-                  name="star"
-                  size={20}
-                  color={selectedPopular === exam ? '#fff' : '#2446a8'}
-                  style={{ marginRight: 6 }}
-                />
+                <MaterialIcons name="star" size={20} color={selectedPopular === exam ? '#fff' : '#2446a8'} />
                 <Text style={[styles.devButtonText, selectedPopular === exam && { color: '#fff' }]}>
                   {exam}
                 </Text>
-                <View
-                  style={[
-                    styles.badge,
-                    { backgroundColor: selectedPopular === exam ? '#fff' : '#f0f0f0' },
-                  ]}
-                >
+                <View style={[styles.badge, { backgroundColor: selectedPopular === exam ? '#fff' : '#f0f0f0' }]}>
                   <Text style={styles.badgeText}>Popular</Text>
                 </View>
               </LinearGradient>
             </TouchableOpacity>
-
             {selectedPopular === exam && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ marginTop: 8, paddingHorizontal: 6 }}>
-                {prepButtons.map((p, j) => (
+              <ScrollView horizontal style={{ marginTop: 8 }}>
+                {prepButtons.map((p) => (
                   <TouchableOpacity
-                    key={j}
+                    key={p}
                     style={styles.prepButton}
-                    activeOpacity={0.8}
                     onPress={() => Alert.alert(p, `${p} for ${exam}`)}
                   >
                     <Text style={styles.prepButtonText}>{p}</Text>
@@ -273,11 +271,10 @@ function AllExamsScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      {/* All Categories Grid */}
       <Text style={styles.subTitle}>All Categories</Text>
       <FlatList
         data={filtered}
-        keyExtractor={(i, idx) => idx.toString()}
+        keyExtractor={(i) => i}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
@@ -285,12 +282,15 @@ function AllExamsScreen({ navigation }) {
           const isSsc = item === 'SSC Exams';
           return (
             <TouchableOpacity
-              style={[styles.categoryGridItem, isSsc && styles.sscCategoryHighlight]}
-              onPress={() => onCategoryPress(item)}
-              activeOpacity={0.8}
+              style={[styles.categoryGridItem, isSsc ? styles.sscHighlight : null]}
+              onPress={() =>
+                navigation.navigate(isSsc ? 'SscPopular' : 'CategoryDetails', {
+                  category: item,
+                })
+              }
             >
               <FontAwesome5 name="clipboard-list" size={18} color={isSsc ? '#fff' : '#2446a8'} />
-              <Text style={[styles.devButtonText, isSsc && { color: '#fff', fontWeight: '800' }]}>{item}</Text>
+              <Text style={[styles.devButtonText, isSsc && { color: '#fff' }]}>{item}</Text>
             </TouchableOpacity>
           );
         }}
@@ -299,7 +299,6 @@ function AllExamsScreen({ navigation }) {
   );
 }
 
-// ----- Tab Screens -----
 function StartExamsScreen() {
   return (
     <View style={styles.subTabScreen}>
@@ -308,64 +307,37 @@ function StartExamsScreen() {
   );
 }
 
-function GovExamsScreen() {
-  const T = createMaterialTopTabNavigator();
+function PrivateJobsScreen() {
   return (
-    <T.Navigator
+    <ScrollView style={{ flex: 1, paddingTop: 16 }}>
+      <Text style={styles.subTabText}>Private Jobs Content?</Text>
+      {/* Add your grid here */}
+    </ScrollView>
+  );
+}
+
+function GovExamsScreen() {
+  const Tab = createMaterialTopTabNavigator();
+  return (
+    <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: '#4e88ff',
         tabBarIndicatorStyle: { backgroundColor: '#4e88ff' },
         tabBarLabelStyle: { fontWeight: '600' },
       }}
     >
-      <T.Screen name="All Exams" component={AllExamsScreen} />
-      <T.Screen name="Start Exams" component={StartExamsScreen} />
-    </T.Navigator>
-  );
-}
-
-function ButtonGrid() {
-  const buttons = [
-    { title: 'Cybersecurity', icon: 'shield-checkmark' },
-    { title: 'PowerPlatform Full Stack Developer', icon: 'code-slash' },
-    { title: 'Java Developer', icon: 'logo-java' },
-    { title: '.NET Developer', icon: 'logo-windows' },
-    { title: 'PHP Developer', icon: 'logo-php' },
-    { title: 'Pega Developer', icon: 'git-branch' },
-  ];
-  return (
-    <ScrollView contentContainerStyle={styles.grid}>
-      {buttons.map((btn, idx) => (
-        <TouchableOpacity
-          key={idx}
-          style={styles.devButton}
-          activeOpacity={0.8}
-          onPress={() => Alert.alert('Selected', btn.title)}
-        >
-          <Ionicons name={btn.icon} size={20} color="#2446a8" style={{ marginBottom: 6 }} />
-          <Text style={styles.devButtonText}>{btn.title}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
-}
-
-function PrivateJobsScreen() {
-  return (
-    <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-      <Text style={styles.subTabText}>Private Jobs Preparation Content</Text>
-      <Text style={styles.subTitle}>Explore Career Paths</Text>
-      <ButtonGrid />
-    </ScrollView>
+      <Tab.Screen name="All Exams" component={AllExamsScreen} />
+      <Tab.Screen name="Start Exams" component={StartExamsScreen} />
+    </Tab.Navigator>
   );
 }
 
 function HomeScreen() {
-  const T = createMaterialTopTabNavigator();
+  const Tab = createMaterialTopTabNavigator();
   return (
     <View style={{ flex: 1 }}>
       <Text style={styles.screenTitle}>Hi, Welcome!</Text>
-      <T.Navigator
+      <Tab.Navigator
         screenOptions={{
           tabBarActiveTintColor: '#4e88ff',
           tabBarIndicatorStyle: { backgroundColor: '#4e88ff' },
@@ -373,19 +345,18 @@ function HomeScreen() {
           tabBarStyle: { backgroundColor: '#f0f4ff' },
         }}
       >
-        <T.Screen name="Gov. Exams" component={GovExamsScreen} />
-        <T.Screen name="Private Jobs" component={PrivateJobsScreen} />
-      </T.Navigator>
+        <Tab.Screen name="Gov. Exams" component={GovExamsScreen} />
+        <Tab.Screen name="Private Jobs" component={PrivateJobsScreen} />
+      </Tab.Navigator>
     </View>
   );
 }
 
 function CategoryDetailsScreen({ route }) {
-  const { category } = route.params;
   return (
     <View style={styles.detailsContainer}>
-      <Text style={styles.detailsTitle}>{category}</Text>
-      <Text style={styles.detailsText}>Details for "{category}" go here.</Text>
+      <Text style={styles.detailsTitle}>{route.params.category}</Text>
+      <Text style={styles.detailsText}>Details for {route.params.category}</Text>
     </View>
   );
 }
@@ -398,203 +369,100 @@ export default function App() {
       <Stack.Navigator initialRouteName="Login" screenOptions={{ headerTitleAlign: 'center' }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="CategoryDetails"
-          component={CategoryDetailsScreen}
-          options={({ route }) => ({ title: route.params.category })}
-        />
         <Stack.Screen name="SscPopular" component={SscPopularScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CategoryDetails" component={CategoryDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-// ----- Styles -----
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f1f5ff', justifyContent: 'center' },
   loginBox: {
-    backgroundColor: '#e0e9ff',
     marginHorizontal: 24,
     padding: 24,
     borderRadius: 24,
-    shadowColor: '#2446a8',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
+    backgroundColor: '#e0e9ff',
   },
-  title: { fontSize: 32, fontWeight: '900', color: '#2446a8', marginBottom: 6, textAlign: 'center' },
-  subtitle: { fontSize: 20, fontWeight: '600', color: '#2446a8', marginBottom: 24, textAlign: 'center' },
+  title: { fontSize: 32, fontWeight: '900', color: '#2446a8', textAlign: 'center' },
+  subtitle: { fontSize: 20, fontWeight: '600', color: '#2446a8', marginVertical: 12, textAlign: 'center' },
   input: {
     backgroundColor: '#fff',
     marginVertical: 8,
-    borderRadius: 14,
     paddingHorizontal: 16,
+    borderRadius: 14,
     fontSize: 16,
-    fontWeight: '600',
     color: '#2446a8',
-    height: 48,
     borderColor: '#a9bcf9',
     borderWidth: 1.5,
+    height: 48,
   },
-  button: { backgroundColor: '#2446a8', paddingVertical: 14, borderRadius: 14, marginTop: 16 },
+  button: { backgroundColor: '#2446a8', padding: 14, borderRadius: 14, marginTop: 16 },
   buttonText: { color: '#fff', fontWeight: '700', fontSize: 18, textAlign: 'center' },
-  screenTitle: { fontSize: 24, fontWeight: '700', color: '#2446a8', marginTop: 24, marginBottom: 12, textAlign: 'center' },
-  subTitle: { fontSize: 22, fontWeight: '700', color: '#2446a8', marginVertical: 12, marginLeft: 12 },
-  devButtonHorizontal: {
+  screenTitle: { fontSize: 24, fontWeight: '700', color: '#2446a8', marginTop: 24, textAlign: 'center' },
+  subTabContent: { flex: 1, backgroundColor: '#f9faff' },
+  subTitle: { fontSize: 20, fontWeight: '700', color: '#2446a8', margin: 12 },
+  searchInput: {
+    margin: 16,
+    borderColor: '#a9bcf9',
+    borderWidth: 1.5,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    fontSize: 16, height: 44,
+    backgroundColor: '#e7eeff', color: '#2446a8',
+  },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 16 },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: '#4e88ff' },
+  popularExamCard: {
+    padding: 12, borderRadius: 16, alignItems: 'center',
+  },
+  popularExamText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    minWidth: 140,
-    borderColor: '#2446a8',
-    borderWidth: 1.5,
-    shadowColor: '#2446a8',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-  },
-  devButtonText: { fontSize: 16, fontWeight: '700', color: '#2446a8', textAlign: 'center' },
-  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginLeft: 8 },
-  badgeText: { color: '#ff5e62', fontWeight: '700', fontSize: 12 },
-  prepButton: {
-    backgroundColor: '#ff9966',
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    marginHorizontal: 6,
-    minWidth: 130,
-    alignItems: 'center',
-    shadowColor: '#ff5e62',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.7,
-    shadowRadius: 10,
-  },
-  prepButtonText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  row: { justifyContent: 'space-between', marginBottom: 12 },
-  categoryGridItem: {
-    backgroundColor: '#d0deff',
-    paddingVertical: 18,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    width: '48%',
-    alignItems: 'center',
-    borderColor: '#2446a8',
-    borderWidth: 1.5,
-    shadowColor: '#2446a8',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-  },
-  sscCategoryHighlight: {
-    backgroundColor: '#4e88ff',
-    borderColor: '#2a5bcc',
-    shadowColor: '#2a5bcc',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-  },
-  subTabContent: { flex: 1, backgroundColor: '#f9faff' },
-  searchInput: {
-    height: 44,
-    margin: 16,
-    borderWidth: 1.6,
-    borderColor: '#a9bcf9',
+    justifyContent: 'space-between',
+    backgroundColor: '#e0e9ff',
     borderRadius: 14,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2446a8',
-    backgroundColor: '#e7eeff',
+    padding: 12,
+    marginBottom: 8,
+  },
+  devButtonHorizontal: {
+    flexDirection: 'row', alignItems: 'center', borderRadius: 16,
+    padding: 12, borderWidth: 1.5, borderColor: '#2446a8',
+  },
+  devButtonText: { fontSize: 16, fontWeight: '700', color: '#2446a8' },
+  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginLeft: 6 },
+  badgeText: { fontSize: 12, fontWeight: '700', color: '#ff5e62' },
+  prepButton: {
+    backgroundColor: '#ff9966', borderRadius: 14,
+    padding: 10, marginRight: 8,
+  },
+  prepButtonText: { color: '#fff', fontWeight: '700' },
+  row: { flexDirection: 'row', justifyContent: 'space-between', margin: 8 },
+  categoryGridItem: {
+    backgroundColor: '#d0deff', padding: 16, borderRadius: 14,
+    alignItems: 'center', marginVertical: 8, flexBasis: '48%',
+  },
+  sscHighlight: {
+    backgroundColor: '#4e88ff',
   },
   subTabScreen: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  subTabText: { fontSize: 18, fontWeight: '600', color: '#2446a8', textAlign: 'center' },
+  subTabText: { fontSize: 18, fontWeight: '600', color: '#2446a8' },
   detailsContainer: { flex: 1, padding: 24, backgroundColor: '#f1f5ff' },
-  detailsTitle: { fontSize: 28, fontWeight: 'bold', color: '#2446a8', marginBottom: 12 },
-  detailsText: { fontSize: 20, fontWeight: '600', color: '#2446a8' },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    marginHorizontal: 16,
-  },
-  headerTitle: { fontSize: 26, fontWeight: 'bold', color: '#4e88ff' },
-  sscExamButton: { margin: 6, borderRadius: 16, overflow: 'hidden', flexBasis: '48%' },
-  sscExamGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    shadowColor: '#764ba2',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-  },
-  sscExamText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 16 },
-  subTabContent: { flex: 1, backgroundColor: '#f9faff' },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginTop: 16,
-  },
-  headerTitle: { fontSize: 26, fontWeight: 'bold', color: '#4e88ff' },
-  searchInput: {
-    height: 44,
-    margin: 16,
-    borderWidth: 1.6,
-    borderColor: '#a9bcf9',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2446a8',
-    backgroundColor: '#e7eeff',
-  },
-  subTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#2446a8',
-    marginVertical: 12,
-    marginLeft: 12,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-  sscExamButton: {
-    margin: 6,
-    borderRadius: 16,
-    overflow: 'hidden',
-    flexBasis: '48%',
-  },
-  sscExamGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    shadowColor: '#764ba2',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-  },
-  sscExamText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  popularExamCard: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    minWidth: 120,
-    alignItems: 'center',
-  },
-  popularExamText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 14,
-  },
+  detailsTitle: { fontSize: 28, fontWeight: '700', color: '#2446a8' },
+  detailsText: { fontSize: 20, color: '#2446a8' },
+  startPrepButton: {
+  backgroundColor: '#4e88ff',
+  padding: 12,
+  marginHorizontal: 16,
+  borderRadius: 12,
+  alignItems: 'center',
+  marginBottom: 24,
+},
+startPrepButtonText: {
+  color: '#fff',
+  fontWeight: '700',
+  fontSize: 14,
+}
+
 });
