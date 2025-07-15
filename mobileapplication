@@ -14,12 +14,13 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
-// -------- Login Screen --------
+// ----- Login Screen -----
 function LoginScreen({ navigation }) {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-
   const handleLogin = () => {
     if (email === 'user@example.com' && password === 'password') {
       navigation.replace('Home');
@@ -27,7 +28,6 @@ function LoginScreen({ navigation }) {
       Alert.alert('Login Failed', 'Use email: user@example.com and password: password');
     }
   };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -36,7 +36,6 @@ function LoginScreen({ navigation }) {
       <View style={styles.loginBox}>
         <Text style={styles.title}>Welcome Back 👋</Text>
         <Text style={styles.subtitle}>Login to continue</Text>
-
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -54,7 +53,6 @@ function LoginScreen({ navigation }) {
           onChangeText={setPassword}
           placeholderTextColor="#555"
         />
-
         <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.8}>
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
@@ -63,72 +61,106 @@ function LoginScreen({ navigation }) {
   );
 }
 
-// -------- Dev Buttons --------
-const ButtonGrid = () => {
-  const buttons = [
-    'Cybersecurity',
-    'PowerPlatform Full Stack Developer',
-    'Java Developer',
-    '.NET Developer',
-    'PHP Developer',
-    'Pega Developer',
-  ];
-  return (
-    <ScrollView contentContainerStyle={styles.grid}>
-      {buttons.map((btn, idx) => (
-        <TouchableOpacity
-          key={idx}
-          style={styles.devButton}
-          onPress={() => alert(btn)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.devButtonText}>{btn}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
-};
-
-// -------- All Exams Tab with Popular & Categories --------
-function AllExamsScreen() {
-  const categories = [
-    'TSPSC Group 2',
-    'APPSC',
+// ----- SSC-Specific Screen with Header & Search -----
+function SscPopularScreen() {
+  const sscExams = [
     'SSC CGL',
     'SSC CHSL',
     'SSC MTS',
-    'UPSC Civil Services',
-    'Bank PO',
-    'Bank Clerk',
-    'RRB NTPC',
-    'RRB Group D',
-    'State Police',
-    'UP Police Sub Inspector',
-    'Insurance Exams',
-    'LIC AAO',
-    'NDA',
-    'CDS',
-    'IBPS RRB',
-    'EPFO',
-    'DRDO CEPTAM',
+    'IB ACIO',
+    'SSC GD Constable',
+    'Delhi Police Constable',
   ];
-
-  const popularExams = [
-    'TSPSC Group2',
-    'SSC CGL',
-    'SSC CHSL',
-    'SSC MTS',
-    'UP Police Sub Inspector',
-  ];
-
   const [search, setSearch] = React.useState('');
-
-  const filteredCategories = categories.filter((item) =>
-    item.toLowerCase().includes(search.toLowerCase())
+  const filtered = sscExams.filter((e) =>
+    e.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <ScrollView style={styles.subTabContent} keyboardShouldPersistTaps="handled">
+      <View style={styles.headerRow}>
+        <MaterialIcons name="school" size={28} color="#4e88ff" style={{ marginRight: 8 }} />
+        <Text style={styles.headerTitle}>SSC Exams</Text>
+      </View>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search SSC exams..."
+        value={search}
+        onChangeText={setSearch}
+        placeholderTextColor="#555"
+      />
+      <View style={styles.grid}>
+        {filtered.map((exam, idx) => (
+          <TouchableOpacity
+            key={idx}
+            style={styles.sscExamButton}
+            activeOpacity={0.8}
+            onPress={() => Alert.alert('SSC Exam Selected', exam)}
+          >
+            <LinearGradient colors={['#667eea', '#764ba2']} style={styles.sscExamGradient}>
+              <Text style={styles.sscExamText}>{exam}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
+  );
+}
+
+// ----- All Exams Main Screen -----
+function AllExamsScreen({ navigation }) {
+  const categories = [
+    'SSC Exams',
+    'Banking Exams',
+    'Teaching Exams',
+    'Civil Service Exams',
+    'Railways Exams',
+    'Engineering Recruitment Exams',
+    'Defence Exams',
+    'State Government Exams',
+    'Police Exams',
+    'Insurance Exams',
+    'Nursing Exams',
+    'Other Government Exams',
+    'NRA CET',
+    'PG Entrance Exams',
+    'MBA Entrance Exams',
+    'CUET and UG Entrance',
+    'Accounting and Commerce',
+    'Judiciary Exams',
+    'Regulatory Body Exams',
+  ];
+
+  const popularExams = [
+    'SSC CGL',
+    'Bank PO',
+    'UPSC Civil Services',
+    'Railways Exams',
+    'Defence Exams',
+  ];
+
+  const [search, setSearch] = React.useState('');
+  const [selectedPopular, setSelectedPopular] = React.useState(null);
+  const prepButtons = ['Start Preparation', 'Syllabus', 'Previous Papers', 'Mock Tests'];
+  const filtered = categories.filter((c) =>
+    c.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const onPopularPress = (exam) => {
+    setSelectedPopular((prev) => (prev === exam ? null : exam));
+  };
+
+  const onCategoryPress = (cat) => {
+    if (cat === 'SSC Exams') {
+      navigation.navigate('SscPopular');
+    } else {
+      navigation.navigate('CategoryDetails', { category: cat });
+    }
+  };
+
+  return (
+    <ScrollView style={styles.subTabContent} keyboardShouldPersistTaps="handled">
+      {/* Search */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search categories..."
@@ -137,47 +169,81 @@ function AllExamsScreen() {
         placeholderTextColor="#555"
       />
 
+      {/* Popular Exams Slider */}
       <Text style={styles.subTitle}>Popular Exams</Text>
-      <FlatList
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={popularExams}
-        keyExtractor={(item, idx) => idx.toString()}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.devButtonHorizontal}
-            onPress={() => alert(`Selected ${item}`)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.devButtonText}>{item}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 8 }}>
+        {popularExams.map((exam, i) => (
+          <View key={i} style={{ marginRight: 12 }}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => onPopularPress(exam)}>
+              <LinearGradient
+                colors={selectedPopular === exam ? ['#ff5e62', '#ff9966'] : ['#a3b9ff', '#7a99ff']}
+                style={styles.devButtonHorizontal}
+              >
+                <MaterialIcons
+                  name="star"
+                  size={20}
+                  color={selectedPopular === exam ? '#fff' : '#2446a8'}
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={[styles.devButtonText, selectedPopular === exam && { color: '#fff' }]}>
+                  {exam}
+                </Text>
+                <View
+                  style={[
+                    styles.badge,
+                    { backgroundColor: selectedPopular === exam ? '#fff' : '#f0f0f0' },
+                  ]}
+                >
+                  <Text style={styles.badgeText}>Popular</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
 
+            {selectedPopular === exam && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ marginTop: 8, paddingHorizontal: 6 }}>
+                {prepButtons.map((p, j) => (
+                  <TouchableOpacity
+                    key={j}
+                    style={styles.prepButton}
+                    activeOpacity={0.8}
+                    onPress={() => Alert.alert(p, `${p} for ${exam}`)}
+                  >
+                    <Text style={styles.prepButtonText}>{p}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* All Categories Grid */}
       <Text style={styles.subTitle}>All Categories</Text>
-
       <FlatList
-        data={filteredCategories}
-        keyExtractor={(item, idx) => idx.toString()}
+        data={filtered}
+        keyExtractor={(i, idx) => idx.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.categoryGridItem}
-            onPress={() => alert(`Selected ${item}`)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.devButtonText}>{item}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          const isSsc = item === 'SSC Exams';
+          return (
+            <TouchableOpacity
+              style={[styles.categoryGridItem, isSsc && styles.sscCategoryHighlight]}
+              onPress={() => onCategoryPress(item)}
+              activeOpacity={0.8}
+            >
+              <FontAwesome5 name="clipboard-list" size={18} color={isSsc ? '#fff' : '#2446a8'} />
+              <Text style={[styles.devButtonText, isSsc && { color: '#fff', fontWeight: '800' }]}>{item}</Text>
+            </TouchableOpacity>
+          );
+        }}
       />
     </ScrollView>
   );
 }
 
-// -------- Start Exams Tab Placeholder --------
+// ----- Tab Screens -----
 function StartExamsScreen() {
   return (
     <View style={styles.subTabScreen}>
@@ -186,20 +252,45 @@ function StartExamsScreen() {
   );
 }
 
-// -------- Gov Exams Tabs (Nested) --------
 function GovExamsScreen() {
-  const InnerTab = createMaterialTopTabNavigator();
+  const T = createMaterialTopTabNavigator();
   return (
-    <InnerTab.Navigator
+    <T.Navigator
       screenOptions={{
         tabBarActiveTintColor: '#4e88ff',
         tabBarIndicatorStyle: { backgroundColor: '#4e88ff' },
         tabBarLabelStyle: { fontWeight: '600' },
       }}
     >
-      <InnerTab.Screen name="All Exams" component={AllExamsScreen} />
-      <InnerTab.Screen name="Start Exams" component={StartExamsScreen} />
-    </InnerTab.Navigator>
+      <T.Screen name="All Exams" component={AllExamsScreen} />
+      <T.Screen name="Start Exams" component={StartExamsScreen} />
+    </T.Navigator>
+  );
+}
+
+function ButtonGrid() {
+  const buttons = [
+    { title: 'Cybersecurity', icon: 'shield-checkmark' },
+    { title: 'PowerPlatform Full Stack Developer', icon: 'code-slash' },
+    { title: 'Java Developer', icon: 'logo-java' },
+    { title: '.NET Developer', icon: 'logo-windows' },
+    { title: 'PHP Developer', icon: 'logo-php' },
+    { title: 'Pega Developer', icon: 'git-branch' },
+  ];
+  return (
+    <ScrollView contentContainerStyle={styles.grid}>
+      {buttons.map((btn, idx) => (
+        <TouchableOpacity
+          key={idx}
+          style={styles.devButton}
+          activeOpacity={0.8}
+          onPress={() => Alert.alert('Selected', btn.title)}
+        >
+          <Ionicons name={btn.icon} size={20} color="#2446a8" style={{ marginBottom: 6 }} />
+          <Text style={styles.devButtonText}>{btn.title}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   );
 }
 
@@ -213,14 +304,12 @@ function PrivateJobsScreen() {
   );
 }
 
-// -------- Home Tabs --------
-const Tab = createMaterialTopTabNavigator();
-
 function HomeScreen() {
+  const T = createMaterialTopTabNavigator();
   return (
     <View style={{ flex: 1 }}>
       <Text style={styles.screenTitle}>Hi, Welcome!</Text>
-      <Tab.Navigator
+      <T.Navigator
         screenOptions={{
           tabBarActiveTintColor: '#4e88ff',
           tabBarIndicatorStyle: { backgroundColor: '#4e88ff' },
@@ -228,219 +317,164 @@ function HomeScreen() {
           tabBarStyle: { backgroundColor: '#f0f4ff' },
         }}
       >
-        <Tab.Screen name="Gov. Exams" component={GovExamsScreen} />
-        <Tab.Screen name="Private Jobs" component={PrivateJobsScreen} />
-      </Tab.Navigator>
+        <T.Screen name="Gov. Exams" component={GovExamsScreen} />
+        <T.Screen name="Private Jobs" component={PrivateJobsScreen} />
+      </T.Navigator>
     </View>
   );
 }
 
-// -------- Navigation --------
+function CategoryDetailsScreen({ route }) {
+  const { category } = route.params;
+  return (
+    <View style={styles.detailsContainer}>
+      <Text style={styles.detailsTitle}>{category}</Text>
+      <Text style={styles.detailsText}>Details for "{category}" go here.</Text>
+    </View>
+  );
+}
+
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: '#4e88ff' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '700' },
-        }}
-      >
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerTitle: 'Dashboard' }} />
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerTitleAlign: 'center' }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="CategoryDetails"
+          component={CategoryDetailsScreen}
+          options={({ route }) => ({ title: route.params.category })}
+        />
+        <Stack.Screen name="SscPopular" component={SscPopularScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-// -------- Styles --------
+// ----- Styles -----
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#edf2f6',
-    justifyContent: 'center',
-    padding: 24,
-  },
+  container: { flex: 1, backgroundColor: '#f1f5ff', justifyContent: 'center' },
   loginBox: {
-    backgroundColor: '#e4ecff',
+    backgroundColor: '#e0e9ff',
+    marginHorizontal: 24,
+    padding: 24,
     borderRadius: 24,
-    padding: 28,
-    shadowColor: '#4e88ff',
-    shadowOpacity: 0.6,
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#2446a8',
-    marginBottom: 8,
-    textAlign: 'center',
-    textShadowColor: '#87a4ff',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#3a4e8c',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  input: {
-    height: 52,
-    borderColor: '#7a9fff',
-    borderWidth: 2,
-    borderRadius: 16,
-    marginBottom: 18,
-    paddingHorizontal: 18,
-    backgroundColor: '#d7e3ff',
-    fontSize: 18,
-    color: '#2446a8',
-    fontWeight: '600',
-    shadowColor: '#4e88ff',
+    shadowColor: '#2446a8',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  button: {
-    backgroundColor: '#3b6df7',
-    paddingVertical: 18,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginTop: 10,
-    shadowColor: '#3b6df7',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.35,
     shadowRadius: 12,
   },
-  buttonText: {
-    color: '#e0e6ff',
-    fontSize: 20,
-    fontWeight: '700',
-    textShadowColor: '#2446a8',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-  },
-
-  screenTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginVertical: 14,
-    textAlign: 'center',
-    color: '#2446a8',
-    textShadowColor: '#a7b8ff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 5,
-  },
-  subTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginVertical: 14,
-    marginLeft: 18,
-    color: '#2d4db9',
-    textShadowColor: '#b3c1ff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 5,
-  },
-
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    paddingBottom: 20,
-  },
-  devButton: {
-    backgroundColor: '#a3b9ff',
-    paddingVertical: 16,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    margin: 10,
-    minWidth: '42%',
-    alignItems: 'center',
-    borderColor: '#3b6df7',
-    borderWidth: 1.8,
-    shadowColor: '#3b6df7',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-  },
-  devButtonHorizontal: {
-    backgroundColor: '#a3b9ff',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginRight: 14,
-    minWidth: 140,
-    alignItems: 'center',
-    borderColor: '#3b6df7',
-    borderWidth: 1.8,
-    shadowColor: '#3b6df7',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-  },
-  devButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#2446a8',
-    textAlign: 'center',
-    textShadowColor: '#e1e7ff',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
-
-  subTabScreen: {
-    height: 120,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#e4ecff',
-  },
-  subTabText: {
-    fontSize: 18,
-    color: '#2d4db9',
-    fontWeight: '600',
-  },
-  subTabContent: {
-    flexGrow: 1,
-    backgroundColor: '#f0f4ff',
-  },
-  searchInput: {
-    height: 48,
-    borderColor: '#7a9fff',
-    borderWidth: 2,
-    borderRadius: 16,
+  title: { fontSize: 32, fontWeight: '900', color: '#2446a8', marginBottom: 6, textAlign: 'center' },
+  subtitle: { fontSize: 20, fontWeight: '600', color: '#2446a8', marginBottom: 24, textAlign: 'center' },
+  input: {
+    backgroundColor: '#fff',
+    marginVertical: 8,
+    borderRadius: 14,
     paddingHorizontal: 16,
-    margin: 14,
-    backgroundColor: '#d7e3ff',
     fontSize: 16,
-    color: '#2446a8',
     fontWeight: '600',
-    shadowColor: '#4e88ff',
+    color: '#2446a8',
+    height: 48,
+    borderColor: '#a9bcf9',
+    borderWidth: 1.5,
+  },
+  button: { backgroundColor: '#2446a8', paddingVertical: 14, borderRadius: 14, marginTop: 16 },
+  buttonText: { color: '#fff', fontWeight: '700', fontSize: 18, textAlign: 'center' },
+  screenTitle: { fontSize: 24, fontWeight: '700', color: '#2446a8', marginTop: 24, marginBottom: 12, textAlign: 'center' },
+  subTitle: { fontSize: 22, fontWeight: '700', color: '#2446a8', marginVertical: 12, marginLeft: 12 },
+  devButtonHorizontal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    minWidth: 140,
+    borderColor: '#2446a8',
+    borderWidth: 1.5,
+    shadowColor: '#2446a8',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowRadius: 10,
   },
-
-  row: {
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  categoryGridItem: {
-    backgroundColor: '#acc8ff',
-    paddingVertical: 22,
-    borderRadius: 24,
-    flex: 1,
-    marginHorizontal: 10,
+  devButtonText: { fontSize: 16, fontWeight: '700', color: '#2446a8', textAlign: 'center' },
+  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginLeft: 8 },
+  badgeText: { color: '#ff5e62', fontWeight: '700', fontSize: 12 },
+  prepButton: {
+    backgroundColor: '#ff9966',
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginHorizontal: 6,
+    minWidth: 130,
     alignItems: 'center',
-    shadowColor: '#3b6df7',
-    shadowOffset: { width: 0, height: 8 },
+    shadowColor: '#ff5e62',
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.7,
-    shadowRadius: 14,
-    borderWidth: 1.6,
-    borderColor: '#3b6df7',
-    minWidth: 140,
+    shadowRadius: 10,
   },
+  prepButtonText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  row: { justifyContent: 'space-between', marginBottom: 12 },
+  categoryGridItem: {
+    backgroundColor: '#d0deff',
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    width: '48%',
+    alignItems: 'center',
+    borderColor: '#2446a8',
+    borderWidth: 1.5,
+    shadowColor: '#2446a8',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+  },
+  sscCategoryHighlight: {
+    backgroundColor: '#4e88ff',
+    borderColor: '#2a5bcc',
+    shadowColor: '#2a5bcc',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+  },
+  subTabContent: { flex: 1, backgroundColor: '#f9faff' },
+  searchInput: {
+    height: 44,
+    margin: 16,
+    borderWidth: 1.6,
+    borderColor: '#a9bcf9',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2446a8',
+    backgroundColor: '#e7eeff',
+  },
+  subTabScreen: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  subTabText: { fontSize: 18, fontWeight: '600', color: '#2446a8', textAlign: 'center' },
+  detailsContainer: { flex: 1, padding: 24, backgroundColor: '#f1f5ff' },
+  detailsTitle: { fontSize: 28, fontWeight: 'bold', color: '#2446a8', marginBottom: 12 },
+  detailsText: { fontSize: 20, fontWeight: '600', color: '#2446a8' },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    marginHorizontal: 16,
+  },
+  headerTitle: { fontSize: 26, fontWeight: 'bold', color: '#4e88ff' },
+  sscExamButton: { margin: 6, borderRadius: 16, overflow: 'hidden', flexBasis: '48%' },
+  sscExamGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    shadowColor: '#764ba2',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+  },
+  sscExamText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 16 },
 });
