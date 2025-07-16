@@ -183,6 +183,154 @@ function SscPopularScreen({ navigation }) {
     </ScrollView>
   );
 }
+//--bankexam--
+ function BankingPopularScreen({ navigation }) {
+  const bankingTabs = [
+    'ALL Exams',
+    'Bank PO',
+    'Bank SO',
+    'Bank Clerk',
+    'BSCB',
+    'Other'
+  ];
+const populartab = [
+    'IBPS PO',
+    'SBI PO',
+    'IBPS Clerk',
+    'SBI Clerk',
+    'BSCB',
+    'Other'
+  ];
+
+  const examsByTab = {
+    'ALL Exams': [
+      'Bank of Baroda LBO',
+      'RRB Office Assistant',
+      'HARCO Bank Clerk',
+      'IBPS SO',
+      'Bank of Baroda Peon',
+      'SBI CBO',
+      'Indian Overseas Bank LBO',
+      'HDFC Bank Po',
+      'Central Bank Of India Credit Officer',
+      'Union Bank Of India LBO',
+      'UCO Bank LBO',
+      'Punjab and Sind Bank LBO',
+      'Bank of Baroda Apprentice',
+      'Meghalaya Apex Bank Assistant',
+      'Bank of Baroda PO',
+
+
+    ],
+    'Bank PO': ['IBPS PO', 'SBI PO'],
+    'Bank SO': ['IBPS SO', 'SBI SO'],
+    'Bank Clerk': ['IBPS Clerk', 'SBI Clerk'],
+    'BSCB': ['Bihar State Cooperative Bank Clerk'],
+    'Other': ['NABARD Grade A', 'RRB Officer Scale-1']
+  };
+
+  const [selectedTab, setSelectedTab] = React.useState('ALL Exams');
+  const [search, setSearch] = React.useState('');
+  const [checkedItems, setCheckedItems] = React.useState({});
+
+  const filtered = (examsByTab[selectedTab] || []).filter((e) =>
+    e.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <ScrollView style={styles.subTabContent} keyboardShouldPersistTaps="handled">
+      <View style={styles.headerRow}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialIcons name="account-balance" size={28} color="#4e88ff" style={{ marginRight: 8 }} />
+          <Text style={styles.headerTitle}>Banking Exams</Text>
+        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <Ionicons name="home" size={26} color="#4e88ff" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Tab Buttons */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10, paddingLeft: 12 }}>
+        {bankingTabs.map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={[styles.prepButton, {
+              backgroundColor: selectedTab === tab ? '#4e88ff' : '#ccc',
+              marginRight: 10
+            }]}
+            onPress={() => setSelectedTab(tab)}
+          >
+            <Text style={styles.prepButtonText}>{tab}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Search */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder={`Search ${selectedTab}...`}
+        value={search}
+        onChangeText={setSearch}
+        placeholderTextColor="#555"
+      />
+
+      <Text style={styles.subTitle}>Popular Banking Exams</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingLeft: 12 }}>
+        {examsByTab['ALL Exams'].map((exam) => (
+          <TouchableOpacity
+            key={exam}
+            style={{ marginRight: 12 }}
+            onPress={() => Alert.alert('Selected', exam)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={['#43cea2', '#185a9d']} style={styles.popularExamCard}>
+              <Text style={styles.popularExamText}>{exam}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <Text style={styles.subTitle}>{selectedTab}</Text>
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+        renderItem={({ item }) => {
+          const isChecked = checkedItems[item] || false;
+          return (
+            <View style={styles.checkboxRow}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <FontAwesome5 name="clipboard-list" size={18} color="#2446a8" />
+                <Text style={[styles.devButtonText, { marginLeft: 10 }]}>{item}</Text>
+              </View>
+              <Checkbox
+                value={isChecked}
+                onValueChange={(newVal) =>
+                  setCheckedItems((prev) => ({ ...prev, [item]: newVal }))
+                }
+                color={isChecked ? '#4e88ff' : undefined}
+              />
+            </View>
+          );
+        }}
+      />
+      {Object.values(checkedItems).some(val => val) && (
+        <TouchableOpacity
+          onPress={() => {
+            const selected = Object.entries(checkedItems)
+              .filter(([_, val]) => val)
+              .map(([key]) => key)
+              .join(', ');
+            Alert.alert('Start Preparation', `You selected: ${selected}`);
+          }}
+          style={styles.startPrepButton}
+        >
+          <Text style={styles.startPrepButtonText}>Start Preparation</Text>
+        </TouchableOpacity>
+      )}
+    </ScrollView>
+  );
+}
 
 // ----- Other Screens -----
 function AllExamsScreen({ navigation }) {
@@ -283,11 +431,12 @@ function AllExamsScreen({ navigation }) {
           return (
             <TouchableOpacity
               style={[styles.categoryGridItem, isSsc ? styles.sscHighlight : null]}
-              onPress={() =>
-                navigation.navigate(isSsc ? 'SscPopular' : 'CategoryDetails', {
-                  category: item,
-                })
-              }
+             onPress={() => {
+  if (item === 'SSC Exams') navigation.navigate('SscPopular');
+  else if (item === 'Banking Exams') navigation.navigate('BankingPopular');
+  else navigation.navigate('CategoryDetails', { category: item });
+}}
+
             >
               <FontAwesome5 name="clipboard-list" size={18} color={isSsc ? '#fff' : '#2446a8'} />
               <Text style={[styles.devButtonText, isSsc && { color: '#fff' }]}>{item}</Text>
@@ -370,6 +519,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SscPopular" component={SscPopularScreen} options={{ headerShown: false }} />
+       <Stack.Screen name="BankingPopular" component={BankingPopularScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CategoryDetails" component={CategoryDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
