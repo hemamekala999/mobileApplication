@@ -193,14 +193,6 @@ function SscPopularScreen({ navigation }) {
     'BSCB',
     'Other'
   ];
-const populartab = [
-    'IBPS PO',
-    'SBI PO',
-    'IBPS Clerk',
-    'SBI Clerk',
-    'BSCB',
-    'Other'
-  ];
 
   const examsByTab = {
     'ALL Exams': [
@@ -219,8 +211,6 @@ const populartab = [
       'Bank of Baroda Apprentice',
       'Meghalaya Apex Bank Assistant',
       'Bank of Baroda PO',
-
-
     ],
     'Bank PO': ['IBPS PO', 'SBI PO'],
     'Bank SO': ['IBPS SO', 'SBI SO'],
@@ -228,6 +218,19 @@ const populartab = [
     'BSCB': ['Bihar State Cooperative Bank Clerk'],
     'Other': ['NABARD Grade A', 'RRB Officer Scale-1']
   };
+
+  const popularExams = [
+    'IBPS PO',
+    'SBI PO',
+    'SBI SO',
+    'IBPS Clerk',
+    'IBPS SO',
+    'SBI Clerk',
+    'Bihar State Cooperative Bank Clerk',
+    'NABARD Grade A',
+    'RRB Officer Scale-1',
+    
+  ];
 
   const [selectedTab, setSelectedTab] = React.useState('ALL Exams');
   const [search, setSearch] = React.useState('');
@@ -274,13 +277,14 @@ const populartab = [
         placeholderTextColor="#555"
       />
 
+      {/* Popular Exams */}
       <Text style={styles.subTitle}>Popular Banking Exams</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingLeft: 12 }}>
-        {examsByTab['ALL Exams'].map((exam) => (
+        {popularExams.map((exam) => (
           <TouchableOpacity
             key={exam}
             style={{ marginRight: 12 }}
-            onPress={() => Alert.alert('Selected', exam)}
+            onPress={() => Alert.alert('Popular', exam)}
             activeOpacity={0.8}
           >
             <LinearGradient colors={['#43cea2', '#185a9d']} style={styles.popularExamCard}>
@@ -331,7 +335,6 @@ const populartab = [
     </ScrollView>
   );
 }
-
 // ----- Other Screens -----
 function AllExamsScreen({ navigation }) {
   const categories = [
