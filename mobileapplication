@@ -214,12 +214,21 @@ function SscPopularScreen({ navigation }) {
       'Bank ofIndia PO',
       'Union Bank of India Apprentice',
       'Canara Bank PO',
+      'BMC Bank JEA',
+      'ICICI PO',
+      'Bank of Maharastra PO',
+      'IDBI Executive',
+      'JAIIB Exam',
+      'AXIS BAnk Assistant Manager',
+      'CAIIB Exam',
+      'BOB Acquisition Officer'
     ],
-    'Bank PO': ['Current Affairs', 'IBPS PO','SBI PO','RRBOfficer Scale-1','Bank of Baroda LBO','SBI CBO','Indian Overseas Bank','HDFC Bank PO','Central Bank Of Inida Credit Officer','Union Bank of India LBO','UCO Bank LBO','Punjab and Sind Bank LBO','Bank of Baroda Po'],
-    'Bank SO': ['IBPS SO', 'SBI SO'],
-    'Bank Clerk': ['IBPS Clerk', 'SBI Clerk'],
-    'BSCB': ['Bihar State Cooperative Bank Clerk'],
-    'Other': ['NABARD Grade A', 'RRB Officer Scale-1']
+    'Bank PO': ['Current Affairs', 'IBPS PO','SBI PO','RRBOfficer Scale-1','Bank of Baroda LBO','SBI CBO','Indian Overseas Bank','HDFC Bank PO','Central Bank Of Inida Credit Officer','Union Bank of India LBO','UCO Bank LBO','Punjab and Sind Bank LBO','Bank of Baroda Po','IDBI JUnior Manager','ICICI PO','JAIIB Exam','AXIS Bank CSO',
+    'ECGC PO',],
+    'Bank SO': ['IBPS SO', 'SBI SO','Agriculture Field Officer-Scale-1','Bank of India SO','Bank Of India So','Indian Bank SO'],
+    'Bank Clerk': ['IBPS Clerk', 'SBI Clerk','Current Affairs','Bihar State Cooperative Bank Clerk','RRB Office Assistant','HARCO Bank Clerk','BAnk of Baroda Peopn','Bank of Inida','BMC Bank JEA','TMB Bank Clerk','EPFO Stenographer','EPFO Assistant','EPFO SSA'],
+    'BSCB': ['BSCB Assistant Multipurpose','BSCB Assistant manager'],
+    'Other': ['RBI Grade B', 'SEBI Grade A','RSCB','NPS Trust','NPS Trust','JK Bank Office Assistant','MSC Bank SO']
   };
 
   const popularExams = [
@@ -290,7 +299,7 @@ function SscPopularScreen({ navigation }) {
             onPress={() => Alert.alert('Popular', exam)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#43cea2', '#185a9d']} style={styles.popularExamCard}>
+            <LinearGradient colors={['#667eea', '#764ba2']} style={styles.popularExamCard}>
               <Text style={styles.popularExamText}>{exam}</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -433,7 +442,7 @@ function AllExamsScreen({ navigation }) {
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
         renderItem={({ item }) => {
-          const isSsc = item === 'SSC Exams';
+         const isSsc = item === 'SSC Exams';
           return (
             <TouchableOpacity
               style={[styles.categoryGridItem, isSsc ? styles.sscHighlight : null]}
